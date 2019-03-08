@@ -1,18 +1,16 @@
 package com.weatherapp.weatherapp;
 
 import android.annotation.SuppressLint;
+import android.appwidget.AppWidgetManager;
+import android.content.ComponentName;
+import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.location.Address;
-import android.location.Geocoder;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.Locale;
+import io.paperdb.Paper;
 
 import static com.weatherapp.weatherapp.GPSLocator.REQ_CODE;
 
@@ -30,6 +28,7 @@ public class MainActivity extends AppCompatActivity {
         tv_longitude = findViewById(R.id.longitude);
         tv_city = findViewById(R.id.city);
 
+        Paper.init(this);
         gpsLocator = new GPSLocator(this);
     }
 
@@ -55,18 +54,14 @@ public class MainActivity extends AppCompatActivity {
     {
         tv_longitude.setText(String.valueOf(gpsLocator.getLongitude()));
         tv_latitude.setText(String.valueOf(gpsLocator.getLatitude()));
+        tv_city.setText(gpsLocator.getAddress());
 
-        List<Address> addresses;
-        Geocoder geocoder = new Geocoder(this, Locale.getDefault());
-
-        try {
-            addresses = geocoder.getFromLocation(gpsLocator.getLatitude(), gpsLocator.getLongitude(), 1);
-        } catch (IOException e) {
-            Toast.makeText(MainActivity.this, "We have problem with localize your position", Toast.LENGTH_LONG).show();
-            return;
-        }
-        String address = addresses.get(0).getAddressLine(0);
-        String city = addresses.get(0).getLocality();
-        tv_city.setText(city+", "+address.split(",")[0]);
+        Paper.book().write("City", gpsLocator.getAddress());
+        Intent intent = new Intent(this, WeatherWidget.class);
+        intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
+        int[] ids = AppWidgetManager.getInstance(getApplication())
+                .getAppWidgetIds(new ComponentName(getApplication(), WeatherWidget.class));
+        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids);
+        sendBroadcast(intent);
     }
 }

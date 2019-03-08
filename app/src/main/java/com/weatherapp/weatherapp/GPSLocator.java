@@ -3,15 +3,23 @@ package com.weatherapp.weatherapp;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.os.Looper;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.widget.Toast;
+
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.Locale;
 
 public class GPSLocator {
 
@@ -50,6 +58,22 @@ public class GPSLocator {
                 }
             }
         };
+    }
+
+    public String getAddress()
+    {
+        List<Address> addresses;
+        Geocoder geocoder = new Geocoder(mainActiv, Locale.getDefault());
+
+        try {
+            addresses = geocoder.getFromLocation(latitude, longitude, 1);
+        } catch (IOException e) {
+            Toast.makeText(mainActiv, "We have problem with localize your position", Toast.LENGTH_LONG).show();
+            return "";
+        }
+        String address = addresses.get(0).getAddressLine(0);
+        String city = addresses.get(0).getLocality();
+        return (city+", "+address.split(",")[0]);
     }
 
     @SuppressLint("RestrictedApi")
