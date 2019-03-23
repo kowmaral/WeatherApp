@@ -8,6 +8,8 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import io.paperdb.Paper;
@@ -16,7 +18,7 @@ import static com.weatherapp.weatherapp.GPSLocator.REQ_CODE;
 
 public class MainActivity extends AppCompatActivity {
 
-    TextView tv_latitude, tv_longitude, tv_city;
+    TextView tv_city;
     GPSLocator gpsLocator;
 
     @Override
@@ -24,8 +26,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        tv_latitude = findViewById(R.id.latitude);
-        tv_longitude = findViewById(R.id.longitude);
         tv_city = findViewById(R.id.city);
 
         Paper.init(this);
@@ -52,8 +52,9 @@ public class MainActivity extends AppCompatActivity {
     @SuppressLint("SetTextI18n")
     public void onLocationChange()
     {
-        tv_longitude.setText(String.valueOf(gpsLocator.getLongitude()));
-        tv_latitude.setText(String.valueOf(gpsLocator.getLatitude()));
+        //TODO: SEND TO WEATHER API
+        //gpsLocator.getLongitude();
+        //gpsLocator.getLatitude();
         tv_city.setText(gpsLocator.getAddress());
 
         Paper.book().write("City", gpsLocator.getAddress());
@@ -63,5 +64,10 @@ public class MainActivity extends AppCompatActivity {
                 .getAppWidgetIds(new ComponentName(getApplication(), WeatherWidget.class));
         intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids);
         sendBroadcast(intent);
+    }
+
+    public void switchGps(View view) {
+        Switch gpsSwitch = (Switch)view;
+        findViewById(R.id.citiesList).setEnabled(gpsSwitch.isChecked());
     }
 }
