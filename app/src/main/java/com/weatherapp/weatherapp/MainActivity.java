@@ -13,6 +13,7 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.Switch;
 import android.widget.TextView;
 
@@ -82,7 +83,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void switchGps(View view) {
         Switch gpsSwitch = (Switch)view;
-        findViewById(R.id.citiesList).setEnabled(gpsSwitch.isChecked());
+        findViewById(R.id.citiesInput).setEnabled(!gpsSwitch.isChecked());
     }
 
     private class AsyncWeatherRequest extends AsyncTask<String, Void, WeatherForecast> {
