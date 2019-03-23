@@ -5,15 +5,18 @@ import android.appwidget.AppWidgetManager;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.TextView;
 
@@ -30,6 +33,7 @@ public class MainActivity extends AppCompatActivity {
     TextView tv_city;
     TextView weatherData;
     GPSLocator gpsLocator;
+    ImageView icon;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +42,7 @@ public class MainActivity extends AppCompatActivity {
 
         tv_city = findViewById(R.id.city);
         weatherData = findViewById(R.id.temperature);
+        icon = findViewById(R.id.weatherIcon);
 
         Paper.init(this);
         gpsLocator = new GPSLocator(this);
@@ -118,6 +123,10 @@ public class MainActivity extends AppCompatActivity {
             tv_city.setText(weather.location.getCity() + " ");
             weatherData.setText((int) (weather.temperature.getTemp() -273) + "°C");
 
+            Resources res = getResources();
+            String mDrawableName = "i" + weather.currentCondition.getIcon(); //use your image name like if your    image name is myimagename.png then use my imagename
+            int resID = res.getIdentifier(mDrawableName , "drawable", getPackageName());
+            icon.setImageResource(resID);
 
 
         }
