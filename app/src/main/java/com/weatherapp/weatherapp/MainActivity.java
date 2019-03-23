@@ -28,6 +28,7 @@ import static com.weatherapp.weatherapp.GPSLocator.REQ_CODE;
 public class MainActivity extends AppCompatActivity {
 
     TextView tv_city;
+    TextView weatherData;
     GPSLocator gpsLocator;
 
     @Override
@@ -36,14 +37,11 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         tv_city = findViewById(R.id.city);
+        weatherData = findViewById(R.id.temperature);
 
         Paper.init(this);
         gpsLocator = new GPSLocator(this);
 
-
-        String city = "Kraków,PL";
-        AsyncWeatherRequest task = new AsyncWeatherRequest();
-        task.execute(new String[]{city});
 
     }
 
@@ -71,6 +69,10 @@ public class MainActivity extends AppCompatActivity {
         //gpsLocator.getLongitude();
         //gpsLocator.getLatitude();
         tv_city.setText(gpsLocator.getAddress());
+
+        String city = gpsLocator.getCity() + "," + gpsLocator.getCountryCode();// "Kraków,PL";
+        AsyncWeatherRequest task = new AsyncWeatherRequest();
+        task.execute(new String[]{city});
 
         Paper.book().write("City", gpsLocator.getAddress());
         Intent intent = new Intent(this, WeatherWidget.class);
@@ -113,7 +115,10 @@ public class MainActivity extends AppCompatActivity {
 
 
             //tutaj mozesz ustawic wszystkie pola z danych z Dżesiki
-            tv_city.setText(weather.toString());
+            tv_city.setText(weather.location.getCity() + " ");
+            weatherData.setText((int) (weather.temperature.getTemp() -273) + "°C");
+
+
 
         }
 

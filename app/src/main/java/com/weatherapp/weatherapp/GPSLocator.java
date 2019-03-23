@@ -29,6 +29,36 @@ public class GPSLocator {
     private double latitude, longitude;
     private MainActivity mainActiv;
 
+    public String getCity() {
+
+        List<Address> addresses;
+        Geocoder geocoder = new Geocoder(mainActiv, Locale.getDefault());
+
+        try {
+            addresses = geocoder.getFromLocation(latitude, longitude, 1);
+        } catch (IOException e) {
+            Toast.makeText(mainActiv, "We have problem with localize your position", Toast.LENGTH_LONG).show();
+            return "";
+        }
+
+        return addresses.get(0).getLocality();
+    }
+
+    public String getCountryCode() {
+
+        List<Address> addresses;
+        Geocoder geocoder = new Geocoder(mainActiv, Locale.getDefault());
+
+        try {
+            addresses = geocoder.getFromLocation(latitude, longitude, 1);
+        } catch (IOException e) {
+            Toast.makeText(mainActiv, "We have problem with localize your position", Toast.LENGTH_LONG).show();
+            return "";
+        }
+
+        return addresses.get(0).getCountryCode();
+    }
+
     GPSLocator(AppCompatActivity activity) {
         mainActiv = (MainActivity) activity;
         if (ActivityCompat.shouldShowRequestPermissionRationale(activity, Manifest.permission.ACCESS_FINE_LOCATION)) {

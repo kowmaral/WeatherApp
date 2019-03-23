@@ -10,7 +10,7 @@ import java.net.URL;
 public class WeatherHttpRequester {
 
     private static String BASE_URL = "http://api.openweathermap.org/data/2.5/weather?q=";
-    private static String APPID = "ASK_ME";
+    private static String APPID = "";
     public String getWeatherData(String location) {
         HttpURLConnection con = null ;
         InputStream is = null;
