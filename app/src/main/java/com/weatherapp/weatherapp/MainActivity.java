@@ -5,12 +5,20 @@ import android.appwidget.AppWidgetManager;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Switch;
 import android.widget.TextView;
+
+import org.json.JSONException;
+
+import java.io.Console;
 
 import io.paperdb.Paper;
 
@@ -30,6 +38,12 @@ public class MainActivity extends AppCompatActivity {
 
         Paper.init(this);
         gpsLocator = new GPSLocator(this);
+
+
+        String city = "Kraków,PL";
+        AsyncWeatherRequest task = new AsyncWeatherRequest();
+        task.execute(new String[]{city});
+
     }
 
     @Override
@@ -69,5 +83,44 @@ public class MainActivity extends AppCompatActivity {
     public void switchGps(View view) {
         Switch gpsSwitch = (Switch)view;
         findViewById(R.id.citiesList).setEnabled(gpsSwitch.isChecked());
+    }
+
+    private class AsyncWeatherRequest extends AsyncTask<String, Void, WeatherForecast> {
+
+        @Override
+        protected WeatherForecast doInBackground(String... params) {
+            WeatherForecast weather = new WeatherForecast();
+            String data = ( (new WeatherHttpRequester()).getWeatherData(params[0]));
+
+            try {
+                weather = JSONWeatherParser.getWeather(data);
+
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            return weather;
+
+        }
+
+
+
+
+        @Override
+        protected void onPostExecute(WeatherForecast weather) {
+            super.onPostExecute(weather);
+
+
+            //tutaj mozesz ustawic wszystkie pola z danych z Dżesiki
+            tv_city.setText(weather.toString());
+
+        }
+
+
+
+
+
+
+
     }
 }
