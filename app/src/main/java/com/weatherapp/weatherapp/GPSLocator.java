@@ -18,6 +18,7 @@ import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -56,7 +57,12 @@ public class GPSLocator {
         if(Geocoder.isPresent()){
             try {
                 Geocoder gc = new Geocoder(mainActiv);
-                Address address= gc.getFromLocationName(city, 1).get(0);
+                List<Address> addresses = gc.getFromLocationName(city, 1);
+                if(addresses.isEmpty())
+                {
+                    return "";
+                }
+                Address address = addresses.get(0);
                 if(address.hasLatitude() && address.hasLongitude()){
                     address = gc.getFromLocation(address.getLatitude(), address.getLongitude(), 1).get(0);
                     return (address.getLocality()+","+address.getCountryCode());

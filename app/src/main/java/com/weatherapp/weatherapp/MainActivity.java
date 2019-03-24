@@ -75,6 +75,10 @@ public class MainActivity extends AppCompatActivity {
     public void onLocationChange()
     {
         String position = getActuallyPosition();
+        if(position.equals(""))
+        {
+            return;
+        }
         tv_city.setText(position);
 
         AsyncWeatherRequest task = new AsyncWeatherRequest();
@@ -96,12 +100,12 @@ public class MainActivity extends AppCompatActivity {
 
     public void switchGps(View view) {
         Switch gpsSwitch = (Switch)view;
-        findViewById(R.id.citiesInput).setEnabled(!gpsSwitch.isChecked());
+        et_location.setEnabled(!gpsSwitch.isChecked());
     }
 
     public void checkLocationAndCondSave(View view) {
         et_location.setText(gpsLocator.findCountryCodeFromCity(String.valueOf(et_location.getText())));
-        if(et_location.getText().equals("")) {
+        if(String.valueOf(et_location.getText()).equals("")) {
             et_location.setFocusable(true);
             Toast.makeText(this, "Nie można zlokalizować podanego miasta", Toast.LENGTH_LONG).show();
         }
@@ -133,8 +137,6 @@ public class MainActivity extends AppCompatActivity {
             String mDrawableName = "i" + weather.currentCondition.getIcon();
             int resID = res.getIdentifier(mDrawableName , "drawable", getPackageName());
             icon.setImageResource(resID);
-
-
         }
     }
 }
