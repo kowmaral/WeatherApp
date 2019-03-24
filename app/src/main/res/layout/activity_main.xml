@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
     tools:context=".MainActivity">
 
     <android.support.v7.widget.CardView
@@ -65,8 +66,8 @@
 
             <ImageView
                 android:id="@+id/weatherIcon"
-                android:layout_width="97dp"
-                android:layout_height="89dp"
+                android:layout_width="146dp"
+                android:layout_height="148dp"
                 android:layout_marginStart="307dp"
                 android:layout_marginTop="10dp"
                 android:layout_marginEnd="16dp"
@@ -76,7 +77,8 @@
                 app:layout_constraintStart_toEndOf="@+id/imageView3"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintVertical_bias="0.0"
-                app:srcCompat="@drawable/i01d" />
+                app:srcCompat="@drawable/i01d"
+                tools:ignore="ContentDescription" />
 
         </android.support.constraint.ConstraintLayout>
 
@@ -138,7 +140,8 @@
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toEndOf="@+id/citiesInput"
                 app:layout_constraintTop_toTopOf="parent"
-                app:srcCompat="@android:drawable/ic_menu_send" />
+                app:srcCompat="@android:drawable/ic_menu_send"
+                tools:ignore="ContentDescription" />
 
         </android.support.constraint.ConstraintLayout>
 
@@ -148,13 +151,15 @@
         android:id="@+id/cardView3"
         android:layout_width="match_parent"
         android:layout_height="340dp"
-        android:layout_marginBottom="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
         app:cardBackgroundColor="@color/cast_intro_overlay_button_background_color"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/cardView2" >
+        app:layout_constraintTop_toBottomOf="@+id/cardView2"
+        tools:layout_editor_absoluteX="31dp"
+        tools:ignore="MissingConstraints">
 
         <android.support.constraint.ConstraintLayout
             android:layout_width="match_parent"
@@ -172,20 +177,96 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <SeekBar
-                android:id="@+id/seekBar"
-                style="@style/Widget.AppCompat.SeekBar.Discrete"
-                android:layout_width="245dp"
-                android:layout_height="28dp"
+            <RadioGroup
+                android:id="@+id/radioGroup"
+                android:layout_width="307dp"
+                android:layout_height="41dp"
                 android:layout_marginStart="8dp"
-                android:layout_marginTop="20dp"
+                android:layout_marginTop="8dp"
                 android:layout_marginEnd="8dp"
-                android:max="4"
-                android:min="1"
-                android:progress="1"
+                android:orientation="horizontal"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/textView" />
+                app:layout_constraintTop_toBottomOf="@+id/textView">
+
+
+                <RadioButton
+                    android:id="@+id/radioButton1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checked="true"
+                    android:layout_marginStart="10dp"
+                    android:onClick="pickForecastTime"
+                    android:text="@string/label_1"
+                    tools:layout_editor_absoluteX="64dp"
+                    tools:layout_editor_absoluteY="0dp" />
+
+                <RadioButton
+                    android:id="@+id/radioButton2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:onClick="pickForecastTime"
+                    android:layout_marginStart="20dp"
+                    android:text="@string/label_2"
+                    tools:layout_editor_absoluteX="269dp"
+                    tools:layout_editor_absoluteY="0dp" />
+
+                <RadioButton
+                    android:id="@+id/radioButton3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:onClick="pickForecastTime"
+                    android:text="@string/label_3"
+                    tools:layout_editor_absoluteX="210dp"
+                    tools:layout_editor_absoluteY="0dp" />
+
+                <RadioButton
+                    android:id="@+id/radioButton4"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:onClick="pickForecastTime"
+                    android:layout_marginStart="20dp"
+                    android:text="@string/label_4"
+                    tools:layout_editor_absoluteX="148dp"
+                    tools:layout_editor_absoluteY="0dp" />
+
+                <RadioButton
+                    android:id="@+id/radioButton5"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:onClick="pickForecastTime"
+                    android:text="@string/label_5"
+                    tools:layout_editor_absoluteX="8dp"
+                    tools:layout_editor_absoluteY="0dp" />
+
+            </RadioGroup>
+
+            <android.support.v7.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="183dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="8dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/radioGroup"
+                app:layout_constraintVertical_bias="0.157"
+                card_view:cardBackgroundColor="@android:color/transparent" >
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:id="@+id/forecastLayout"
+                    android:weightSum="5"
+                    android:orientation="horizontal">
+
+                </LinearLayout>
+
+            </android.support.v7.widget.CardView>
 
         </android.support.constraint.ConstraintLayout>
 

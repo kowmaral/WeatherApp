@@ -4,4 +4,9 @@
     <string name="add_widget">Add widget</string>
     <string name="label_useGps">Użyj GPS</string>
     <string name="label_long_term_forecast">Pogoda długoterminowa</string>
+    <string name="label_1">1</string>
+    <string name="label_2">2</string>
+    <string name="label_3">3</string>
+    <string name="label_4">4</string>
+    <string name="label_5">5</string>
 </resources>

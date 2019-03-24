@@ -6,13 +6,19 @@ import android.content.ComponentName;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.CardView;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RadioButton;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -30,6 +36,11 @@ public class MainActivity extends AppCompatActivity {
     private EditText et_location;
     private GPSLocator gpsLocator;
     private ImageView icon;
+    private LinearLayout forecastLayout;
+    private final int LINEAR_LAYOUT_ID = 66;
+    private final int DATE_TEXT_VIEW_ID = 1;
+    private final int ICON_IMAGE_VIEW_ID = 2;
+    private final int TEMP_TEXT_VIEW_ID = 3;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,9 +51,59 @@ public class MainActivity extends AppCompatActivity {
         tv_city = findViewById(R.id.city);
         weatherData = findViewById(R.id.temperature);
         icon = findViewById(R.id.weatherIcon);
+        forecastLayout = findViewById(R.id.forecastLayout);
+        pickForecastTime(findViewById(R.id.radioButton1));
 
         Paper.init(this);
         gpsLocator = new GPSLocator(this);
+    }
+
+    @SuppressLint("ResourceType")
+    private void buildOneDayView(float layoutWeight, int numberOfDay)
+    {
+        CardView cv = new CardView(this);
+        cv.setLayoutParams(new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                layoutWeight
+        ));
+        cv.setCardBackgroundColor(Color.TRANSPARENT);
+        cv.setId(numberOfDay);
+        forecastLayout.addView(cv);
+
+        LinearLayout ll = new LinearLayout(this);
+        ll.setOrientation(LinearLayout.VERTICAL);
+        ll.setId(LINEAR_LAYOUT_ID);
+        cv.addView(ll);
+
+        TextView date = new TextView(this);
+        date.setText("");
+        date.setLayoutParams(new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                1));
+        date.setGravity(Gravity.CENTER);
+        date.setId(DATE_TEXT_VIEW_ID);
+        ll.addView(date);
+
+        ImageView imageView = new ImageView(this);
+        imageView.setImageResource(R.drawable.i01d);
+        imageView.setLayoutParams(new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                2));
+        imageView.setId(ICON_IMAGE_VIEW_ID);
+        ll.addView(imageView);
+
+        TextView temperature = new TextView(this);
+        temperature.setText("");
+        temperature.setId(TEMP_TEXT_VIEW_ID);
+        temperature.setLayoutParams(new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                1));
+        temperature.setGravity(Gravity.CENTER);
+        ll.addView(temperature);
     }
 
     @Override
@@ -109,6 +170,28 @@ public class MainActivity extends AppCompatActivity {
             et_location.setFocusable(true);
             Toast.makeText(this, "Nie można zlokalizować podanego miasta", Toast.LENGTH_LONG).show();
         }
+    }
+
+    public void pickForecastTime(View view) {
+
+        float MAX_NUMBER_OF_DAYS_TO_FORECAST = 5.0f;
+        forecastLayout.removeAllViews();
+        int numOfDays = Integer.parseInt(((RadioButton)view).getText().toString());
+        for(int i=1 ; i< numOfDays+1; ++i)
+        {
+            buildOneDayView(MAX_NUMBER_OF_DAYS_TO_FORECAST/numOfDays, i);
+        }
+        //TODO: fill forecast from api(applyForecastData) example below
+        applyForecastData(1,"24.03.2019", R.drawable.i04d, "32C");
+    }
+
+    @SuppressLint("ResourceType")
+    private void applyForecastData(int numOfDay, String date, @DrawableRes int icon, String temp)
+    {
+        LinearLayout ll = forecastLayout.findViewById(numOfDay).findViewById(LINEAR_LAYOUT_ID);
+        ((TextView)ll.findViewById(DATE_TEXT_VIEW_ID)).setText(date);
+        ((ImageView)ll.findViewById(ICON_IMAGE_VIEW_ID)).setImageResource(icon);
+        ((TextView)ll.findViewById(TEMP_TEXT_VIEW_ID)).setText(temp);
     }
 
     @SuppressLint("StaticFieldLeak")
