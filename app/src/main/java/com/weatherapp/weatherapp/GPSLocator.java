@@ -30,22 +30,15 @@ public class GPSLocator {
     private MainActivity mainActiv;
 
     public String getCity() {
-
-        List<Address> addresses;
-        Geocoder geocoder = new Geocoder(mainActiv, Locale.getDefault());
-
-        try {
-            addresses = geocoder.getFromLocation(latitude, longitude, 1);
-        } catch (IOException e) {
-            Toast.makeText(mainActiv, "We have problem with localize your position", Toast.LENGTH_LONG).show();
-            return "";
-        }
-
-        return addresses.get(0).getLocality();
+        return getAddressFromLocation().getLocality();
     }
 
-    public String getCountryCode() {
+    String getCountryCode() {
+        return getAddressFromLocation().getCountryCode();
+    }
 
+    private Address getAddressFromLocation()
+    {
         List<Address> addresses;
         Geocoder geocoder = new Geocoder(mainActiv, Locale.getDefault());
 
@@ -53,10 +46,24 @@ public class GPSLocator {
             addresses = geocoder.getFromLocation(latitude, longitude, 1);
         } catch (IOException e) {
             Toast.makeText(mainActiv, "We have problem with localize your position", Toast.LENGTH_LONG).show();
-            return "";
+            return new Address(null);
         }
+        return addresses.get(0);
+    }
 
-        return addresses.get(0).getCountryCode();
+    String findCountryCodeFromCity(String city)
+    {
+        if(Geocoder.isPresent()){
+            try {
+                Geocoder gc = new Geocoder(mainActiv);
+                Address address= gc.getFromLocationName(city, 1).get(0);
+                if(address.hasLatitude() && address.hasLongitude()){
+                    address = gc.getFromLocation(address.getLatitude(), address.getLongitude(), 1).get(0);
+                    return (address.getLocality()+","+address.getCountryCode());
+                }
+            } catch (IOException ignored) {}
+        }
+        return "";
     }
 
     GPSLocator(AppCompatActivity activity) {
@@ -90,22 +97,6 @@ public class GPSLocator {
         };
     }
 
-    public String getAddress()
-    {
-        List<Address> addresses;
-        Geocoder geocoder = new Geocoder(mainActiv, Locale.getDefault());
-
-        try {
-            addresses = geocoder.getFromLocation(latitude, longitude, 1);
-        } catch (IOException e) {
-            Toast.makeText(mainActiv, "We have problem with localize your position", Toast.LENGTH_LONG).show();
-            return "";
-        }
-        String address = addresses.get(0).getAddressLine(0);
-        String city = addresses.get(0).getLocality();
-        return (city+", "+address.split(",")[0]);
-    }
-
     @SuppressLint("RestrictedApi")
     private void buildLocationReq() {
 
@@ -114,13 +105,5 @@ public class GPSLocator {
         gpsReq.setInterval(10);//Params to gps
         gpsReq.setFastestInterval(7);
         gpsReq.setSmallestDisplacement((float) 0.000001);
-    }
-
-    public double getLatitude() {
-        return latitude;
-    }
-
-    public double getLongitude() {
-        return longitude;
     }
 }

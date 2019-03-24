@@ -6,23 +6,18 @@ import android.content.ComponentName;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.json.JSONException;
-
-import java.io.Console;
 
 import io.paperdb.Paper;
 
@@ -30,24 +25,24 @@ import static com.weatherapp.weatherapp.GPSLocator.REQ_CODE;
 
 public class MainActivity extends AppCompatActivity {
 
-    TextView tv_city;
-    TextView weatherData;
-    GPSLocator gpsLocator;
-    ImageView icon;
+    private TextView tv_city, weatherData;
+    private Switch gpsSwitch;
+    private EditText et_location;
+    private GPSLocator gpsLocator;
+    private ImageView icon;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        gpsSwitch = findViewById(R.id.switch1);
+        et_location = findViewById(R.id.citiesInput);
         tv_city = findViewById(R.id.city);
         weatherData = findViewById(R.id.temperature);
         icon = findViewById(R.id.weatherIcon);
 
         Paper.init(this);
         gpsLocator = new GPSLocator(this);
-
-
     }
 
     @Override
@@ -67,19 +62,30 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private String getActuallyPosition()
+    {
+        if(!gpsSwitch.isChecked())
+        {
+            return String.valueOf(et_location.getText());
+        }
+        return (gpsLocator.getCity() + "," + gpsLocator.getCountryCode());
+    }
+
     @SuppressLint("SetTextI18n")
     public void onLocationChange()
     {
-        //TODO: SEND TO WEATHER API
-        //gpsLocator.getLongitude();
-        //gpsLocator.getLatitude();
-        tv_city.setText(gpsLocator.getAddress());
+        String position = getActuallyPosition();
+        tv_city.setText(position);
 
-        String city = gpsLocator.getCity() + "," + gpsLocator.getCountryCode();// "Kraków,PL";
         AsyncWeatherRequest task = new AsyncWeatherRequest();
-        task.execute(new String[]{city});
+        task.execute(position);
 
-        Paper.book().write("City", gpsLocator.getAddress());
+        Paper.book().write("City", position);
+        refreshWidgets();
+    }
+
+    private void refreshWidgets()
+    {
         Intent intent = new Intent(this, WeatherWidget.class);
         intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
         int[] ids = AppWidgetManager.getInstance(getApplication())
@@ -93,49 +99,42 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.citiesInput).setEnabled(!gpsSwitch.isChecked());
     }
 
+    public void checkLocationAndCondSave(View view) {
+        et_location.setText(gpsLocator.findCountryCodeFromCity(String.valueOf(et_location.getText())));
+        if(et_location.getText().equals("")) {
+            et_location.setFocusable(true);
+            Toast.makeText(this, "Nie można zlokalizować podanego miasta", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    @SuppressLint("StaticFieldLeak")
     private class AsyncWeatherRequest extends AsyncTask<String, Void, WeatherForecast> {
 
         @Override
         protected WeatherForecast doInBackground(String... params) {
             WeatherForecast weather = new WeatherForecast();
             String data = ( (new WeatherHttpRequester()).getWeatherData(params[0]));
-
             try {
                 weather = JSONWeatherParser.getWeather(data);
-
-
             } catch (JSONException e) {
                 e.printStackTrace();
             }
             return weather;
-
         }
 
-
-
-
+        @SuppressLint("SetTextI18n")
         @Override
         protected void onPostExecute(WeatherForecast weather) {
             super.onPostExecute(weather);
-
-
-            //tutaj mozesz ustawic wszystkie pola z danych z Dżesiki
             tv_city.setText(weather.location.getCity() + " ");
             weatherData.setText((int) (weather.temperature.getTemp() -273) + "°C");
 
             Resources res = getResources();
-            String mDrawableName = "i" + weather.currentCondition.getIcon(); //use your image name like if your    image name is myimagename.png then use my imagename
+            String mDrawableName = "i" + weather.currentCondition.getIcon();
             int resID = res.getIdentifier(mDrawableName , "drawable", getPackageName());
             icon.setImageResource(resID);
 
 
         }
-
-
-
-
-
-
-
     }
 }
