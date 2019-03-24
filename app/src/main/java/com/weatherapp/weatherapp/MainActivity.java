@@ -144,9 +144,6 @@ public class MainActivity extends AppCompatActivity {
 
         AsyncWeatherRequest task = new AsyncWeatherRequest();
         task.execute(position);
-
-        Paper.book().write("City", position);
-        refreshWidgets();
     }
 
     private void refreshWidgets()
@@ -232,6 +229,11 @@ public class MainActivity extends AppCompatActivity {
             String mDrawableName = "i" + weather.currentCondition.getIcon();
             int resID = res.getIdentifier(mDrawableName , "drawable", getPackageName());
             icon.setImageResource(resID);
+
+            Paper.book().write("City", weather.location.getCity());
+            Paper.book().write("Icon", mDrawableName);
+            Paper.book().write("Temperature", String.valueOf((int)(weather.temperature.getTemp() - 273)));
+            refreshWidgets();
         }
     }
 }
