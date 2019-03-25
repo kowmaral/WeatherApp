@@ -1,12 +1,9 @@
 package com.weatherapp.weatherapp;
 
-import android.app.Activity;
-import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.Context;
-import android.content.Intent;
-import android.graphics.Color;
+import android.content.res.Resources;
 import android.widget.RemoteViews;
 
 import io.paperdb.Paper;
@@ -17,10 +14,15 @@ public class WeatherWidget extends AppWidgetProvider {
                                 int appWidgetId) {
 
         Paper.init(context);
-        CharSequence widgetText = Paper.book().read("City");
         // Construct the RemoteViews object
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.weather_widget);
-        views.setTextViewText(R.id.appwidget_text, widgetText);
+        views.setTextViewText(R.id.appwidget_city, (CharSequence) Paper.book().read("City"));
+        views.setTextViewText(R.id.appwidget_temp,Paper.book().read("Temperature") + "°C");
+
+        Resources res = context.getResources();
+        String mDrawableName =  Paper.book().read("Icon");
+        int resID = res.getIdentifier(mDrawableName , "drawable", context.getPackageName());
+        views.setImageViewResource(R.id.appwidget_icon, resID);
 
         // Instruct the widget manager to update the widget
         appWidgetManager.updateAppWidget(appWidgetId, views);

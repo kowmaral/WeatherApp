@@ -144,9 +144,6 @@ public class MainActivity extends AppCompatActivity {
 
         AsyncWeatherRequest task = new AsyncWeatherRequest();
         task.execute(position);
-
-        Paper.book().write("City", position);
-        refreshWidgets();
     }
 
     private void refreshWidgets()
@@ -162,6 +159,10 @@ public class MainActivity extends AppCompatActivity {
     public void switchGps(View view) {
         Switch gpsSwitch = (Switch)view;
         et_location.setEnabled(!gpsSwitch.isChecked());
+        if(gpsSwitch.isChecked())
+        {
+            onLocationChange();
+        }
     }
 
     public void checkLocationAndCondSave(View view) {
@@ -169,6 +170,10 @@ public class MainActivity extends AppCompatActivity {
         if(String.valueOf(et_location.getText()).equals("")) {
             et_location.setFocusable(true);
             Toast.makeText(this, "Nie można zlokalizować podanego miasta", Toast.LENGTH_LONG).show();
+        }
+        else
+        {
+            onLocationChange();
         }
     }
 
@@ -181,7 +186,7 @@ public class MainActivity extends AppCompatActivity {
         {
             buildOneDayView(MAX_NUMBER_OF_DAYS_TO_FORECAST/numOfDays, i);
         }
-        //TODO: fill forecast from api(applyForecastData) example below
+        //TODO: fill forecast from api(applyForecastData and getActuallyPosition) example below
         applyForecastData(1,"24.03.2019", R.drawable.i04d, "32C");
     }
 
@@ -192,6 +197,10 @@ public class MainActivity extends AppCompatActivity {
         ((TextView)ll.findViewById(DATE_TEXT_VIEW_ID)).setText(date);
         ((ImageView)ll.findViewById(ICON_IMAGE_VIEW_ID)).setImageResource(icon);
         ((TextView)ll.findViewById(TEMP_TEXT_VIEW_ID)).setText(temp);
+    }
+
+    public void refreshWeather(View view) {
+        onLocationChange();
     }
 
     @SuppressLint("StaticFieldLeak")
@@ -220,6 +229,11 @@ public class MainActivity extends AppCompatActivity {
             String mDrawableName = "i" + weather.currentCondition.getIcon();
             int resID = res.getIdentifier(mDrawableName , "drawable", getPackageName());
             icon.setImageResource(resID);
+
+            Paper.book().write("City", weather.location.getCity());
+            Paper.book().write("Icon", mDrawableName);
+            Paper.book().write("Temperature", String.valueOf((int)(weather.temperature.getTemp() - 273)));
+            refreshWidgets();
         }
     }
 }

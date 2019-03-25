@@ -62,6 +62,7 @@ public class GPSLocator {
                 {
                     return "";
                 }
+                gc = new Geocoder(mainActiv, new Locale("en"));
                 Address address = addresses.get(0);
                 if(address.hasLatitude() && address.hasLongitude()){
                     address = gc.getFromLocation(address.getLatitude(), address.getLongitude(), 1).get(0);
