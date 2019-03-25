@@ -2,7 +2,7 @@ package com.weatherapp.weatherapp;
 
 import java.util.Arrays;
 
-public class WeatherForecast {
+public class Weather {
 
     public Location location;
     public CurrentCondition currentCondition = new CurrentCondition();
@@ -11,12 +11,12 @@ public class WeatherForecast {
     public Rain rain = new Rain();
     public Snow snow = new Snow()	;
     public Clouds clouds = new Clouds();
+    String date;
 
-    public byte[] iconData;
 
     @Override
     public String toString() {
-        return "WeatherForecast{" +
+        return "Weather{" +
                 "location=" + location +
                 ", currentCondition=" + currentCondition +
                 ", temperature=" + temperature +
@@ -215,5 +215,6 @@ public class WeatherForecast {
                     '}';
         }
     }
-
 }
+
+

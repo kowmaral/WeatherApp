@@ -5,10 +5,13 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class JSONWeatherParser {
 
-    public static WeatherForecast getWeather(String data) throws JSONException  {
-        WeatherForecast weather = new WeatherForecast();
+    public static Weather getWeather(String data) throws JSONException  {
+        Weather weather = new Weather();
 
 
         JSONObject jObj = new JSONObject(data);
@@ -55,11 +58,61 @@ public class JSONWeatherParser {
 
         return weather;
     }
+    public static List<Weather> getForecast(String data) throws JSONException {
 
+
+        List<Weather> forecast = new ArrayList<Weather>();
+
+        JSONObject jObj = new JSONObject(data);
+
+        JSONArray listArray = getArray("list", jObj);
+
+
+        for (int i=0; i < listArray.length(); i++) {
+            JSONObject arrayObj = listArray.getJSONObject(i);
+
+            Weather weather = new Weather();
+
+            weather.date = getString("dt_txt", arrayObj);
+
+            JSONObject main = getObject("main", arrayObj);
+
+            weather.currentCondition.setPressure(getFloat("pressure", main));
+            weather.currentCondition.setHumidity(getFloat("humidity", main));
+            weather.temperature.setMaxTemp(getFloat("temp_max", main));
+            weather.temperature.setMinTemp(getFloat("temp_min", main));
+            weather.temperature.setTemp(getFloat("temp", main));
+
+            JSONArray jArr = arrayObj.getJSONArray("weather");
+            JSONObject JSONWeather = jArr.getJSONObject(0);
+            weather.currentCondition.setWeatherId(getInt("id", JSONWeather));
+            weather.currentCondition.setDescr(getString("description", JSONWeather));
+            weather.currentCondition.setCondition(getString("main", JSONWeather));
+            weather.currentCondition.setIcon(getString("icon", JSONWeather));
+
+            JSONObject wObj = getObject("wind", arrayObj);
+            weather.wind.setSpeed(getFloat("speed", wObj));
+
+
+            JSONObject cObj = getObject("clouds", arrayObj);
+            weather.clouds.setPerc(getInt("all", cObj));
+
+            forecast.add(weather);
+
+        }
+
+
+        return forecast;
+    }
 
     private static JSONObject getObject(String tagName, JSONObject jObj)  throws JSONException {
         JSONObject subObj = jObj.getJSONObject(tagName);
         return subObj;
+    }
+    
+    private static JSONArray getArray(String tagName, JSONObject jObj) throws JSONException{
+        JSONArray array = jObj.getJSONArray(tagName);
+        return array;
     }
 
     private static String getString(String tagName, JSONObject jObj) throws JSONException {
