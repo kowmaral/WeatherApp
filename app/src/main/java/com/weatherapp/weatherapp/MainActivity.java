@@ -204,11 +204,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @SuppressLint("StaticFieldLeak")
-    private class AsyncWeatherRequest extends AsyncTask<String, Void, WeatherForecast> {
+    private class AsyncWeatherRequest extends AsyncTask<String, Void, Weather> {
 
         @Override
-        protected WeatherForecast doInBackground(String... params) {
-            WeatherForecast weather = new WeatherForecast();
+        protected Weather doInBackground(String... params) {
+            Weather weather = new Weather();
             String data = ( (new WeatherHttpRequester()).getWeatherData(params[0]));
             try {
                 weather = JSONWeatherParser.getWeather(data);
@@ -220,7 +220,7 @@ public class MainActivity extends AppCompatActivity {
 
         @SuppressLint("SetTextI18n")
         @Override
-        protected void onPostExecute(WeatherForecast weather) {
+        protected void onPostExecute(Weather weather) {
             super.onPostExecute(weather);
             tv_city.setText(weather.location.getCity() + " ");
             weatherData.setText((int) (weather.temperature.getTemp() -273) + "°C");
