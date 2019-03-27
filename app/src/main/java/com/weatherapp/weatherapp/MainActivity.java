@@ -209,7 +209,12 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected Weather doInBackground(String... params) {
             Weather weather = new Weather();
-            String data = ( (new WeatherHttpRequester()).getWeatherData(params[0]));
+
+            String data = (new WeatherHttpRequester()).getWeatherData(params[0]);
+            if(data == null)
+            {
+                return null;
+            }
             try {
                 weather = JSONWeatherParser.getWeather(data);
             } catch (JSONException e) {
@@ -221,6 +226,10 @@ public class MainActivity extends AppCompatActivity {
         @SuppressLint("SetTextI18n")
         @Override
         protected void onPostExecute(Weather weather) {
+            if(weather == null)
+            {
+                return;
+            }
             super.onPostExecute(weather);
             tv_city.setText(weather.location.getCity() + " ");
             weatherData.setText((int) (weather.temperature.getTemp() -273) + "°C");
