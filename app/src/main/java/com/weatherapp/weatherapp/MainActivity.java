@@ -23,6 +23,9 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+
 import org.json.JSONException;
 
 import io.paperdb.Paper;
@@ -53,6 +56,8 @@ public class MainActivity extends AppCompatActivity {
         icon = findViewById(R.id.weatherIcon);
         forecastLayout = findViewById(R.id.forecastLayout);
         pickForecastTime(findViewById(R.id.radioButton1));
+
+        ((AdView)findViewById(R.id.adView)).loadAd(new AdRequest.Builder().build());
 
         Paper.init(this);
         gpsLocator = new GPSLocator(this);
@@ -112,10 +117,8 @@ public class MainActivity extends AppCompatActivity {
         switch (requestCode) {
             case REQ_CODE: {
                 if (grantResults.length > 0) {
-                    if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
-                    } else if (grantResults[0] == PackageManager.PERMISSION_DENIED) {
-
+                    if (grantResults[0] == PackageManager.PERMISSION_DENIED) {
+                        System.exit(-1);
                     }
                 }
                 break;
@@ -208,8 +211,7 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected Weather doInBackground(String... params) {
-            Weather weather = new Weather();
-
+            Weather weather;
             String data = (new WeatherHttpRequester()).getWeatherData(params[0]);
             if(data == null)
             {
@@ -219,6 +221,7 @@ public class MainActivity extends AppCompatActivity {
                 weather = JSONWeatherParser.getWeather(data);
             } catch (JSONException e) {
                 e.printStackTrace();
+                return null;
             }
             return weather;
         }
