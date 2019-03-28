@@ -22,14 +22,11 @@ import android.widget.RadioButton;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
-
 import org.json.JSONException;
-
+import java.util.List;
 import io.paperdb.Paper;
-
 import static com.weatherapp.weatherapp.GPSLocator.REQ_CODE;
 
 public class MainActivity extends AppCompatActivity {
@@ -40,27 +37,28 @@ public class MainActivity extends AppCompatActivity {
     private GPSLocator gpsLocator;
     private ImageView icon;
     private LinearLayout forecastLayout;
-    private final int LINEAR_LAYOUT_ID = 66;
-    private final int DATE_TEXT_VIEW_ID = 1;
-    private final int ICON_IMAGE_VIEW_ID = 2;
-    private final int TEMP_TEXT_VIEW_ID = 3;
+    private int LINEAR_LAYOUT_ID = 66;
+    private final int DATE_TEXT_VIEW_ID = 123456;
+    private final int ICON_IMAGE_VIEW_ID = 234567;
+    private final int TEMP_TEXT_VIEW_ID = 345678;
+    private final String HOUR_TO_TAKE_FORECAST_PARAMS = "12:00:00";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        Paper.init(this);
+        gpsLocator = new GPSLocator(this);
+
         gpsSwitch = findViewById(R.id.switch1);
         et_location = findViewById(R.id.citiesInput);
         tv_city = findViewById(R.id.city);
         weatherData = findViewById(R.id.temperature);
         icon = findViewById(R.id.weatherIcon);
         forecastLayout = findViewById(R.id.forecastLayout);
-        pickForecastTime(findViewById(R.id.radioButton1));
 
         ((AdView)findViewById(R.id.adView)).loadAd(new AdRequest.Builder().build());
-
-        Paper.init(this);
-        gpsLocator = new GPSLocator(this);
     }
 
     @SuppressLint("ResourceType")
@@ -92,7 +90,7 @@ public class MainActivity extends AppCompatActivity {
         ll.addView(date);
 
         ImageView imageView = new ImageView(this);
-        imageView.setImageResource(R.drawable.i01d);
+        imageView.setImageResource(R.drawable.cast_mini_controller_progress_drawable);
         imageView.setLayoutParams(new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT,
@@ -189,21 +187,82 @@ public class MainActivity extends AppCompatActivity {
         {
             buildOneDayView(MAX_NUMBER_OF_DAYS_TO_FORECAST/numOfDays, i);
         }
-        //TODO: fill forecast from api(applyForecastData and getActuallyPosition) example below
-        applyForecastData(1,"24.03.2019", R.drawable.i04d, "32C");
+        String position = getActuallyPosition();
+        if(position.equals(""))
+        {
+            return;
+        }
+        AsyncForecastRequest task = new AsyncForecastRequest(numOfDays);
+        task.execute(position);
     }
 
-    @SuppressLint("ResourceType")
-    private void applyForecastData(int numOfDay, String date, @DrawableRes int icon, String temp)
+    @SuppressLint({"ResourceType", "SetTextI18n"})
+    private void applyForecastData(int numOfDay, String date, @DrawableRes int icon, float temp)
     {
         LinearLayout ll = forecastLayout.findViewById(numOfDay).findViewById(LINEAR_LAYOUT_ID);
         ((TextView)ll.findViewById(DATE_TEXT_VIEW_ID)).setText(date);
         ((ImageView)ll.findViewById(ICON_IMAGE_VIEW_ID)).setImageResource(icon);
-        ((TextView)ll.findViewById(TEMP_TEXT_VIEW_ID)).setText(temp);
+        ((TextView)ll.findViewById(TEMP_TEXT_VIEW_ID)).setText(String.valueOf((int) temp) + "°C");
     }
 
     public void refreshWeather(View view) {
         onLocationChange();
+    }
+
+    @SuppressLint("StaticFieldLeak")
+    private class AsyncForecastRequest extends AsyncTask<String, Void, List<Weather>> {
+
+        private int numOfForecastDay;
+
+        AsyncForecastRequest(int numOfDay)
+        {
+            super();
+            numOfForecastDay = numOfDay;
+        }
+
+        @Override
+        protected List<Weather> doInBackground(String... params) {
+            List<Weather> weather;
+            String data = (new WeatherHttpRequester()).getForecastData(params[0]);
+            if(data == null)
+            {
+                return null;
+            }
+            try {
+                weather = JSONWeatherParser.getForecast(data);
+            } catch (JSONException e) {
+                e.printStackTrace();
+                return null;
+            }
+            return weather;
+        }
+
+        @SuppressLint("SetTextI18n")
+        @Override
+        protected void onPostExecute(List<Weather> weatherList) {
+            if(weatherList == null)
+            {
+                return;
+            }
+            super.onPostExecute(weatherList);
+
+            for(int i=weatherList.size()-1; i >= 0; --i)
+            {
+                Weather weather = weatherList.get(i);
+                if(!weather.date.split(" ")[1].equals(HOUR_TO_TAKE_FORECAST_PARAMS))
+                {
+                    weatherList.remove(weather);
+                }
+            }
+            Resources res = getResources();
+            for(int i = 0; i< numOfForecastDay; ++i)
+            {
+                Weather weather = weatherList.get(i);
+                String mDrawableName = "i" + weather.currentCondition.getIcon();
+                int resID = res.getIdentifier(mDrawableName , "drawable", getPackageName());
+                applyForecastData(i + 1,weather.date.split(" ")[0], resID, weather.temperature.getTemp()-273);
+            }
+        }
     }
 
     @SuppressLint("StaticFieldLeak")
