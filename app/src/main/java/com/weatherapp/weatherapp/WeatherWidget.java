@@ -5,7 +5,6 @@ import android.appwidget.AppWidgetProvider;
 import android.content.Context;
 import android.content.res.Resources;
 import android.widget.RemoteViews;
-
 import io.paperdb.Paper;
 
 public class WeatherWidget extends AppWidgetProvider {

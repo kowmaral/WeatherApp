@@ -1,22 +1,16 @@
 package com.weatherapp.weatherapp;
 
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.List;
 
-public class JSONWeatherParser {
+class JSONWeatherParser {
 
-    public static Weather getWeather(String data) throws JSONException  {
+    static Weather getWeather(String data) throws JSONException  {
         Weather weather = new Weather();
-
-
         JSONObject jObj = new JSONObject(data);
-
-
         Location loc = new Location();
 
         JSONObject coordObj = getObject("coord", jObj);
@@ -30,9 +24,7 @@ public class JSONWeatherParser {
         loc.setCity(getString("name", jObj));
         weather.location = loc;
 
-
         JSONArray jArr = jObj.getJSONArray("weather");
-
 
         JSONObject JSONWeather = jArr.getJSONObject(0);
         weather.currentCondition.setWeatherId(getInt("id", JSONWeather));
@@ -47,7 +39,6 @@ public class JSONWeatherParser {
         weather.temperature.setMinTemp(getFloat("temp_min", mainObj));
         weather.temperature.setTemp(getFloat("temp", mainObj));
 
-
         JSONObject wObj = getObject("wind", jObj);
         weather.wind.setSpeed(getFloat("speed", wObj));
 
@@ -58,10 +49,10 @@ public class JSONWeatherParser {
 
         return weather;
     }
-    public static List<Weather> getForecast(String data) throws JSONException {
+    static List<Weather> getForecast(String data) throws JSONException {
 
 
-        List<Weather> forecast = new ArrayList<Weather>();
+        List<Weather> forecast = new ArrayList<>();
 
         JSONObject jObj = new JSONObject(data);
 
@@ -106,13 +97,11 @@ public class JSONWeatherParser {
     }
 
     private static JSONObject getObject(String tagName, JSONObject jObj)  throws JSONException {
-        JSONObject subObj = jObj.getJSONObject(tagName);
-        return subObj;
+        return jObj.getJSONObject(tagName);
     }
     
     private static JSONArray getArray(String tagName, JSONObject jObj) throws JSONException{
-        JSONArray array = jObj.getJSONArray(tagName);
-        return array;
+        return jObj.getJSONArray(tagName);
     }
 
     private static String getString(String tagName, JSONObject jObj) throws JSONException {

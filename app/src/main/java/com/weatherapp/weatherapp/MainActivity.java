@@ -41,15 +41,14 @@ public class MainActivity extends AppCompatActivity {
     private final int DATE_TEXT_VIEW_ID = 123456;
     private final int ICON_IMAGE_VIEW_ID = 234567;
     private final int TEMP_TEXT_VIEW_ID = 345678;
-    private final String HOUR_TO_TAKE_FORECAST_PARAMS = "12:00:00";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Paper.init(this);
         gpsLocator = new GPSLocator(this);
+        Paper.init(this);
 
         gpsSwitch = findViewById(R.id.switch1);
         et_location = findViewById(R.id.citiesInput);
@@ -141,7 +140,6 @@ public class MainActivity extends AppCompatActivity {
         {
             return;
         }
-        tv_city.setText(position);
 
         AsyncWeatherRequest task = new AsyncWeatherRequest();
         task.execute(position);
@@ -209,9 +207,15 @@ public class MainActivity extends AppCompatActivity {
         onLocationChange();
     }
 
+    private int convertKelvin2Celsius(double kelvinVal)
+    {
+        return ((int)kelvinVal - 273);
+    }
+
     @SuppressLint("StaticFieldLeak")
     private class AsyncForecastRequest extends AsyncTask<String, Void, List<Weather>> {
 
+        private final String HOUR_TO_TAKE_FORECAST_PARAMS = "12:00:00";
         private int numOfForecastDay;
 
         AsyncForecastRequest(int numOfDay)
@@ -260,7 +264,11 @@ public class MainActivity extends AppCompatActivity {
                 Weather weather = weatherList.get(i);
                 String mDrawableName = "i" + weather.currentCondition.getIcon();
                 int resID = res.getIdentifier(mDrawableName , "drawable", getPackageName());
-                applyForecastData(i + 1,weather.date.split(" ")[0], resID, weather.temperature.getTemp()-273);
+                applyForecastData(
+                        i + 1,
+                        weather.date.split(" ")[0],
+                        resID,
+                        convertKelvin2Celsius(weather.temperature.getTemp()));
             }
         }
     }
@@ -294,7 +302,7 @@ public class MainActivity extends AppCompatActivity {
             }
             super.onPostExecute(weather);
             tv_city.setText(weather.location.getCity() + " ");
-            weatherData.setText((int) (weather.temperature.getTemp() -273) + "°C");
+            weatherData.setText(convertKelvin2Celsius(weather.temperature.getTemp()) + "°C");
 
             Resources res = getResources();
             String mDrawableName = "i" + weather.currentCondition.getIcon();
@@ -303,7 +311,7 @@ public class MainActivity extends AppCompatActivity {
 
             Paper.book().write("City", weather.location.getCity());
             Paper.book().write("Icon", mDrawableName);
-            Paper.book().write("Temperature", String.valueOf((int)(weather.temperature.getTemp() - 273)));
+            Paper.book().write("Temperature", String.valueOf(convertKelvin2Celsius(weather.temperature.getTemp())));
             refreshWidgets();
         }
     }
