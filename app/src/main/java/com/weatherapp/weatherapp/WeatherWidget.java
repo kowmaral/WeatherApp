@@ -1,5 +1,6 @@
 package com.weatherapp.weatherapp;
 
+import android.app.ActivityManager;
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
@@ -8,7 +9,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.widget.RemoteViews;
+
+import java.util.List;
+
 import io.paperdb.Paper;
+
+import static android.appwidget.AppWidgetManager.ACTION_APPWIDGET_UPDATE;
 
 public class WeatherWidget extends AppWidgetProvider {
 
@@ -45,17 +51,33 @@ public class WeatherWidget extends AppWidgetProvider {
         return PendingIntent.getBroadcast(context, 0, intent, 0);
     }
 
+    public boolean isMainActivityRunning(Context context)
+    {
+        ActivityManager manager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+        List<ActivityManager.RunningTaskInfo> tasks = manager.getRunningTasks(Integer.MAX_VALUE);
+
+        for (ActivityManager.RunningTaskInfo task : tasks) {
+            if (context.getPackageName().equalsIgnoreCase(task.baseActivity.getPackageName()))
+                return true;
+        }
+        return false;
+    }
+
     @Override
     public void onReceive(Context context, Intent intent) {
 
         super.onReceive(context, intent);
-        if (WidgetLayout.equals(intent.getAction())) {
+        if (WidgetLayout.equals(intent.getAction()))
+        {//open by click
             Intent myIntent = new Intent(context, MainActivity.class);
             context.startActivity(myIntent);
-
-            //TODO: it should be at some timer
-//            Intent myIntent = new Intent(context, MainActivityBackground.class);
-//            context.startActivity(myIntent);
+        }
+        else if(ACTION_APPWIDGET_UPDATE.equals(intent.getAction()))
+        {//update at background
+            if(!isMainActivityRunning(context)) {
+                Intent myIntent = new Intent(context, MainActivityBackground.class);
+                context.startActivity(myIntent);
+            }
         }
     }
 }
