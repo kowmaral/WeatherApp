@@ -204,7 +204,12 @@ public class MainActivity extends AppCompatActivity {
     @SuppressLint({"ResourceType", "SetTextI18n"})
     private void applyForecastData(int numOfDay, String date, @DrawableRes int icon, float temp)
     {
-        LinearLayout ll = forecastLayout.findViewById(numOfDay).findViewById(LINEAR_LAYOUT_ID);
+        CardView cardView = forecastLayout.findViewById(numOfDay);
+        if(cardView == null)
+        {
+            return;
+        }
+        LinearLayout ll = cardView.findViewById(LINEAR_LAYOUT_ID);
         ((TextView)ll.findViewById(DATE_TEXT_VIEW_ID)).setText(date);
         ((ImageView)ll.findViewById(ICON_IMAGE_VIEW_ID)).setImageResource(icon);
         ((TextView)ll.findViewById(TEMP_TEXT_VIEW_ID)).setText(String.valueOf((int) temp) + "°C");
@@ -266,17 +271,17 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
             Resources res = getResources();
-            for(int i = 0; i< numOfForecastDay; ++i)
-            {
+            for (int i = 0; i < numOfForecastDay; ++i) {
                 Weather weather = weatherList.get(i);
                 String mDrawableName = "i" + weather.currentCondition.getIcon();
-                int resID = res.getIdentifier(mDrawableName , "drawable", getPackageName());
+                int resID = res.getIdentifier(mDrawableName, "drawable", getPackageName());
                 applyForecastData(
                         i + 1,
                         weather.date.split(" ")[0],
                         resID,
                         convertKelvin2Celsius(weather.temperature.getTemp()));
             }
+
         }
     }
 
