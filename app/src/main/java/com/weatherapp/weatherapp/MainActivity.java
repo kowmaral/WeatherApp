@@ -19,6 +19,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -47,6 +48,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        forecastLayout = findViewById(R.id.forecastLayout);
+
         gpsLocator = new GPSLocator(this);
         Paper.init(this);
 
@@ -55,7 +58,6 @@ public class MainActivity extends AppCompatActivity {
         tv_city = findViewById(R.id.city);
         weatherData = findViewById(R.id.temperature);
         icon = findViewById(R.id.weatherIcon);
-        forecastLayout = findViewById(R.id.forecastLayout);
 
         ((AdView)findViewById(R.id.adView)).loadAd(new AdRequest.Builder().build());
     }
@@ -143,6 +145,11 @@ public class MainActivity extends AppCompatActivity {
 
         AsyncWeatherRequest task = new AsyncWeatherRequest();
         task.execute(position);
+
+        RadioGroup radioGroup = findViewById(R.id.radioGroup);
+        int radioButtonID = radioGroup.getCheckedRadioButtonId();
+        View radioButton = radioGroup.findViewById(radioButtonID);
+        pickForecastTime(radioButton);
     }
 
     private void refreshWidgets()
