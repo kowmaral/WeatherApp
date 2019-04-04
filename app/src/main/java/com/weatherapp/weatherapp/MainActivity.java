@@ -49,12 +49,19 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         forecastLayout = findViewById(R.id.forecastLayout);
-
-        gpsLocator = new GPSLocator(this);
-        Paper.init(this);
-
         gpsSwitch = findViewById(R.id.switch1);
         et_location = findViewById(R.id.citiesInput);
+        Paper.init(this);
+        try
+        {
+            gpsSwitch.setChecked((Boolean) Paper.book().read("gpsSwitch"));
+        } catch (Exception ignore){}
+        if(!gpsSwitch.isChecked())
+        {
+            et_location.setText((CharSequence) Paper.book().read("City"));
+        }
+        gpsLocator = new GPSLocator(this);
+
         tv_city = findViewById(R.id.city);
         weatherData = findViewById(R.id.temperature);
         icon = findViewById(R.id.weatherIcon);
@@ -164,6 +171,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void switchGps(View view) {
         Switch gpsSwitch = (Switch)view;
+        Paper.book().write("gpsSwitch", gpsSwitch.isChecked());
         et_location.setEnabled(!gpsSwitch.isChecked());
         if(gpsSwitch.isChecked())
         {
@@ -262,7 +270,7 @@ public class MainActivity extends AppCompatActivity {
             }
             super.onPostExecute(weatherList);
 
-            for(int i=weatherList.size()-1; i >= 0; --i)
+            for(int i = weatherList.size()-1; i >= 0; --i)
             {
                 Weather weather = weatherList.get(i);
                 if(!weather.date.split(" ")[1].equals(HOUR_TO_TAKE_FORECAST_PARAMS))
