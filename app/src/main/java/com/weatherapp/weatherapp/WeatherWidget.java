@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.widget.RemoteViews;
+import android.widget.Toast;
 
 import java.util.List;
 
@@ -75,8 +76,14 @@ public class WeatherWidget extends AppWidgetProvider {
         else if(ACTION_APPWIDGET_UPDATE.equals(intent.getAction()))
         {//update at background
             if(!isMainActivityRunning(context)) {
-                Intent myIntent = new Intent(context, MainActivityBackground.class);
-                context.startActivity(myIntent);
+                try {
+                    Intent myIntent = new Intent(context, MainActivityBackground.class);
+                    context.startActivity(myIntent);
+                }
+                catch (Exception e)
+                {
+                    Toast.makeText(context, "We cannot update widget data", Toast.LENGTH_LONG).show();
+                }
             }
         }
     }
