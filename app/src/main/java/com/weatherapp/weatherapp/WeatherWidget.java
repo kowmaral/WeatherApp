@@ -75,7 +75,7 @@ public class WeatherWidget extends AppWidgetProvider {
         }
         else if(ACTION_APPWIDGET_UPDATE.equals(intent.getAction()))
         {//update at background
-            if(!isMainActivityRunning(context)) {
+            if((System.currentTimeMillis() - MainActivityBackground.time > 1800000) && !isMainActivityRunning(context)) {
                 try {
                     Intent myIntent = new Intent(context, MainActivityBackground.class);
                     context.startActivity(myIntent);
